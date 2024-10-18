@@ -6,9 +6,19 @@
 
         <slot />
 
-        <footer v-if="hasFooter">
-          <button>{{ successButtonLabel }}</button>
-          <button>{{ cancelButtonLabel }}</button>
+        <footer v-if="hasFooter" class="flex justify-end mt-4">
+          <button
+            @click="successHandler"
+            class="rounded px-8 py-2 bg-red-400 hover:bg-red-500 text-white"
+          >
+            {{ cancelButtonLabel }}
+          </button>
+          <button
+            @click="cancelHandler"
+            class="rounded px-8 py-2 ml-4 bg-green-800 hover:bg-green-900 text-white"
+          >
+            {{ successButtonLabel }}
+          </button>
         </footer>
       </div>
     </div>
@@ -26,6 +36,12 @@ export default {
   },
   data() {
     return {}
+  },
+  methods: {
+    cancelHandler() {
+      this.$router.go(-1)
+    },
+    successHandler() {},
   },
 }
 </script>

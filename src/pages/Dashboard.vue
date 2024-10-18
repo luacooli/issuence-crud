@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div id="dashboard">
     <div class="flex items-center justify-center h-screen bg-gray-100">
       <LayoutPage title="Clientes" :hasFooter="false">
         <div class="grid grid-cols-2 gap-2">
@@ -7,9 +7,11 @@
             <h4 class="font-medium mb-2">Clientes cadastrados</h4>
             <div class="flex items-center relative">
               <span class="material-icons text-gray-700">apartment</span>
-              <span class="text-3xl font-bold ml-1">{{ 126 }}</span>
+              <span class="text-3xl font-bold ml-2">
+                {{ String(this.users.length).padStart(2, '0') }}
+              </span>
               <span
-                class="text-sm font-bold absolute top-0 left-20 text-green-700 ml-2"
+                class="text-sm font-bold absolute top-0 left-20 text-green-700"
               >
                 +{{ 26 }}
               </span>
@@ -69,23 +71,32 @@
 
 <script>
 import { db } from '@/firebase'
+import { collection, getDocs } from 'firebase/firestore' // Import Firestore methods
+
 import LayoutPage from '@/components/LayoutPage.vue'
 
 export default {
   components: { LayoutPage },
-  name: 'App',
-  created() {
-    const users = db.ref('users')
+  // eslint-disable-next-line vue/multi-word-component-names
+  name: 'Dashboard',
+  async mounted() {
+    const usersRef = collection(db, 'users')
 
-    users.on('value', (snapshot) => {
-      this.users = snapshot.val() || []
-    })
-
-    console.log(users)
+    try {
+      const querySnapshot = await getDocs(usersRef)
+      console.log(querySnapshot)
+      const usersArray = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }))
+      this.users = usersArray
+    } catch (error) {
+      console.error('Error fetching users: ', error)
+    }
   },
   data() {
     return {
-      user: null,
+      users: null,
       certificates: [
         { id: 1, color: 'green', quantity: '118', label: 'integrados' },
         { id: 2, color: 'yellow', quantity: '36', label: 'vencem em breve' },

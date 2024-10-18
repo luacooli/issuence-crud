@@ -42,24 +42,27 @@ export default {
   name: 'ClientList',
   components: { LayoutPage },
   created() {
-    // const users = db.collection('users').get()
+    const users = db.collection('users')
+
+    console.log('users');
+    console.log(users);
 
     // users.on('value', (snapshot) => {
     //   this.users = snapshot.val() || []
     // })
-    const usersRef = db.ref('users')
 
-    usersRef.on('value', (snapshot) => {
-      const usersData = snapshot.val()
-      if (usersData) {
-        this.users = Object.keys(usersData).map((key) => ({
-          id: key,
-          ...usersData[key],
-        }))
-      } else {
-        this.users = []
-      }
-    })
+    // const usersRef = db.ref('users')
+    // usersRef.on('value', (snapshot) => {
+    //   const usersData = snapshot.val()
+    //   if (usersData) {
+    //     this.users = Object.keys(usersData).map((key) => ({
+    //       id: key,
+    //       ...usersData[key],
+    //     }))
+    //   } else {
+    //     this.users = []
+    //   }
+    // })
   },
   data() {
     return {
