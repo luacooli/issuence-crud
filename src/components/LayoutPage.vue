@@ -8,13 +8,13 @@
 
         <footer v-if="hasFooter" class="flex justify-end mt-4">
           <button
-            @click="successHandler"
+            @click="cancelHandler"
             class="rounded px-8 py-2 bg-red-400 hover:bg-red-500 text-white"
           >
             {{ cancelButtonLabel }}
           </button>
           <button
-            @click="cancelHandler"
+            @click="successHandler"
             class="rounded px-8 py-2 ml-4 bg-green-800 hover:bg-green-900 text-white"
           >
             {{ successButtonLabel }}
@@ -29,10 +29,20 @@
 export default {
   name: 'LayoutPage',
   props: {
-    title: String,
-    hasFooter: Boolean,
-    successButtonLabel: String,
-    cancelButtonLabel: String,
+    title: {
+      type: String,
+      required: true,
+    },
+    hasFooter: {
+      type: Boolean,
+      required: true,
+    },
+    successButtonLabel: {
+      type: String,
+    },
+    cancelButtonLabel: {
+      type: String,
+    },
   },
   data() {
     return {}
@@ -41,7 +51,9 @@ export default {
     cancelHandler() {
       this.$router.go(-1)
     },
-    successHandler() {},
+    successHandler() {
+      this.$emit('success')
+    },
   },
 }
 </script>

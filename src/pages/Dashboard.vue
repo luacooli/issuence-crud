@@ -8,7 +8,7 @@
             <div class="flex items-center relative">
               <span class="material-icons text-gray-700">apartment</span>
               <span class="text-3xl font-bold ml-2">
-                {{ String(this.users.length).padStart(2, '0') }}
+                {{ String(this.users?.length).padStart(2, '0') }}
               </span>
               <span
                 class="text-sm font-bold absolute top-0 left-20 text-green-700"
@@ -71,7 +71,7 @@
 
 <script>
 import { db } from '@/firebase'
-import { collection, getDocs } from 'firebase/firestore' // Import Firestore methods
+import { collection, getDocs } from 'firebase/firestore'
 
 import LayoutPage from '@/components/LayoutPage.vue'
 
@@ -84,7 +84,6 @@ export default {
 
     try {
       const querySnapshot = await getDocs(usersRef)
-      console.log(querySnapshot)
       const usersArray = querySnapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
@@ -106,8 +105,6 @@ export default {
   },
   methods: {
     goToClientList() {
-      console.log('foi')
-
       this.$router.push({ name: 'ClientList' })
     },
   },
