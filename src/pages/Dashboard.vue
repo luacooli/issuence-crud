@@ -70,6 +70,7 @@
 </template>
 
 <script>
+import axios from 'axios'
 import { db } from '@/firebase'
 import { collection, query, where, getDocs } from 'firebase/firestore'
 
@@ -96,6 +97,10 @@ export default {
   methods: {
     async fetchUsers() {
       const usersRef = collection(db, 'users')
+      const response = await axios.get('http://localhost:3000/')
+
+      console.log('users from server: ', response.data)
+
       try {
         const querySnapshot = await getDocs(usersRef)
         const usersArray = querySnapshot.docs.map((doc) => ({
