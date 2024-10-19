@@ -24,3 +24,4 @@ pnpm-debug.log*
 
 # Ignore Firebase Admin SDK service account key
 /server/firebase-adminsdk.json
+./firebase
