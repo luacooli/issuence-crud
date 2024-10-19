@@ -7,26 +7,35 @@
       cancelButtonLabel="Voltar"
       @success="openAddClientModal"
     >
-      <table class="table-auto border border-slate-500 rounded">
-        <thead>
+      <table
+        class="table-auto w-full text-left bg-white rounded-lg border border-slate-300 shadow-md"
+      >
+        <thead class="bg-slate-100">
           <tr>
             <th
               v-for="(item, i) in items"
               :key="i"
-              class="border border-slate-600"
+              class="px-4 py-2 border-b border-slate-300 text-slate-700 font-semibold"
             >
               {{ item }}
             </th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="user in users" :key="user.id">
-            <td class="border border-slate-600">{{ user.name }}</td>
-            <td class="border border-slate-600">{{ user.email }}</td>
-            <td class="border border-slate-600 max-w-8">
+          <tr
+            v-for="user in users"
+            :key="user.id"
+            @dblclick="editUser(user)"
+            class="hover:bg-slate-100 cursor-pointer transition ease-in-out duration-200"
+          >
+            <td class="px-4 py-2 border-b border-slate-300">{{ user.name }}</td>
+            <td class="px-4 py-2 border-b border-slate-300">
+              {{ user.email }}
+            </td>
+            <td class="px-4 py-2 border-b border-slate-300">
               {{ user.birthdate }}
             </td>
-            <td class="border border-slate-600 max-w-8">
+            <td class="px-4 py-2 border-b border-slate-300 text-right">
               <button
                 @click="deleteUser(user.id)"
                 class="text-red-600 hover:text-red-800"
@@ -76,7 +85,14 @@
 
 <script>
 import { db } from '@/firebase'
-import { collection, getDocs, addDoc, deleteDoc, doc } from 'firebase/firestore'
+import {
+  collection,
+  getDocs,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  doc,
+} from 'firebase/firestore'
 
 import LayoutPage from '@/components/LayoutPage.vue'
 import Modal from '@/components/Modal.vue'
@@ -111,23 +127,48 @@ export default {
         console.error('Error fetching users: ', error)
       }
     },
+    clearFormFields() {
+      this.name = ''
+      this.email = ''
+      this.birthdate = ''
+      this.editingUserId = null
+    },
     async saveClient() {
       const docRef = collection(db, 'users')
 
       try {
-        await addDoc(docRef, {
-          name: this.name,
-          email: this.email,
-          birthdate: this.birthdate,
-          createdAt: new Date(),
-        })
-        alert('Cliente registrado com sucesso!')
-        this.fetchUsers()
+        if (this.editingUserId) {
+          const userDoc = doc(db, 'users', this.editingUserId)
+          await updateDoc(userDoc, {
+            name: this.name,
+            email: this.email,
+            birthdate: this.birthdate,
+          })
+          alert('Cliente atualizado com sucesso!')
+        } else {
+          await addDoc(docRef, {
+            name: this.name,
+            email: this.email,
+            birthdate: this.birthdate,
+            createdAt: new Date(),
+          })
+          alert('Cliente registrado com sucesso!')
+        }
       } catch (error) {
         console.error('Error adding user: ', error)
       } finally {
+        this.fetchUsers()
         this.closeAddClientModal()
       }
+    },
+    editUser(user) {
+      console.log(user)
+      this.name = user.name
+      this.email = user.email
+      this.birthdate = user.birthdate
+      this.editingUserId = user.id
+
+      this.showAddClientModal = true
     },
     async deleteUser(userId) {
       const userDoc = doc(db, 'users', userId)
@@ -140,6 +181,7 @@ export default {
       }
     },
     openAddClientModal() {
+      this.clearFormFields()
       this.showAddClientModal = true
     },
     closeAddClientModal() {
