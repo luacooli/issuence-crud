@@ -71,7 +71,7 @@
 
 <script>
 import { db } from '@/firebase'
-import { collection, getDocs } from 'firebase/firestore'
+import { collection, query, where, getDocs } from 'firebase/firestore'
 
 import LayoutPage from '@/components/LayoutPage.vue'
 
@@ -80,18 +80,8 @@ export default {
   // eslint-disable-next-line vue/multi-word-component-names
   name: 'Dashboard',
   async mounted() {
-    const usersRef = collection(db, 'users')
-
-    try {
-      const querySnapshot = await getDocs(usersRef)
-      const usersArray = querySnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }))
-      this.users = usersArray
-    } catch (error) {
-      console.error('Error fetching users: ', error)
-    }
+    this.fetchUsers()
+    this.fetchCertificates()
   },
   data() {
     return {
@@ -104,6 +94,50 @@ export default {
     }
   },
   methods: {
+    async fetchUsers() {
+      const usersRef = collection(db, 'users')
+      try {
+        const querySnapshot = await getDocs(usersRef)
+        const usersArray = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }))
+        this.users = usersArray
+      } catch (error) {
+        console.error('Error fetching users: ', error)
+      }
+    },
+    async fetchCertificates() {
+      const certificatesRef = collection(db, 'certificates')
+
+      try {
+        // Query for 'integrados'
+        const integratedQuery = query(
+          certificatesRef,
+          where('type', '==', 'integrated')
+        )
+        const integratedSnapshot = await getDocs(integratedQuery)
+        this.certificates[0].quantity = integratedSnapshot.size
+
+        // Query for 'vencem em breve'
+        const expireSoonQuery = query(
+          certificatesRef,
+          where('type', '==', 'expire-soon')
+        )
+        const expireSoonSnapshot = await getDocs(expireSoonQuery)
+        this.certificates[1].quantity = expireSoonSnapshot.size
+
+        // Query for 'vencidos'
+        const expiredQuery = query(
+          certificatesRef,
+          where('type', '==', 'expired')
+        )
+        const expiredSnapshot = await getDocs(expiredQuery)
+        this.certificates[2].quantity = expiredSnapshot.size
+      } catch (error) {
+        console.error('Error fetching certificates: ', error)
+      }
+    },
     goToClientList() {
       this.$router.push({ name: 'ClientList' })
     },
